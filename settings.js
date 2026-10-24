@@ -356,7 +356,7 @@ function exportSettings() {
     const exportData = {
         ...settings,
         exportedAt: new Date().toISOString(),
-        version: '1.1.2'
+        version: '1.1.3'
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });

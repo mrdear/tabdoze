@@ -5,7 +5,7 @@ const favicon = parameters.get('favicon');
 const wakeButton = document.getElementById('wakeTab');
 const pageTitle = document.getElementById('pageTitle');
 
-document.title = originalTitle;
+document.title = `💤 ${originalTitle}`;
 pageTitle.textContent = originalTitle;
 pageTitle.hidden = !originalTitle;
 

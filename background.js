@@ -703,7 +703,7 @@ async function suspendIdleActiveTab(sender) {
     if (sender.frameId !== 0 || sender.tab?.id === undefined) return { success: false };
     const tab = await chrome.tabs.get(sender.tab.id).catch(() => null);
     if (!isActiveSleepCandidate(tab)) return { success: false };
-    const favicon = tab.pinned ? await createSleepingFavicon(tab.url) : null;
+    const favicon = await createSleepingFavicon(tab.url);
 
     // Read frame activity at the deadline so iframe input also keeps the page awake.
     const activity = await chrome.scripting.executeScript({

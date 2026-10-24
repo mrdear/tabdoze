@@ -9,7 +9,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(root, 'manifest.json'), 'u
 test('manifest exposes the TabDoze identity without changing the fixed key', () => {
     assert.equal(manifest.short_name, 'TabDoze');
     assert.match(manifest.name, /^TabDoze\b/);
-    assert.equal(manifest.version, '1.1.2');
+    assert.equal(manifest.version, '1.1.3');
     assert.equal(manifest.homepage_url, 'https://github.com/mrdear/tabdoze');
     assert.equal(
         manifest.key,

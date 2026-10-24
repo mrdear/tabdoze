@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TabDoze - Let Idle Tabs Sleep",
   "short_name": "TabDoze",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoobNJgenmx7lowykgn3MwUGtFnPb2OnBvZByQ7Ur1sQeaxDMmVzblZ27zCsFyrvYWMGYdS10kwJoQENneUTY8CQr4KMXJb8aPculKz5IPAeVyr7PcBY2uOQe5c5Eor6iJaFjENRXsd0/kU/pS15GSamv70Eg3KtZfq2FcYtuFCbFYCTwsuiNKXCAHw8Xq8O+mtfRr9ZhtsgfTchzpuG+h7oQnmYToUwa3j4opreKdyFghFb8HetzxmZCw3RnbIO2VJ0yZh+rPeeQNkDNZ/zdsaXs817aAoUMZvLLt+irJxUkHRg20xYxYP/oTCXMasvFDNvoNOq/JrYxJlGv2qhENwIDAQAB",
   "description": "Let inactive tabs sleep with Chrome's native discard. Keep their place, reduce background load, and browse without tracking.",
   "homepage_url": "https://github.com/mrdear/tabdoze",
