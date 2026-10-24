@@ -13,6 +13,8 @@ rm -f "${OUTPUT_FILE}"
 zip -q "${OUTPUT_FILE}" \
   manifest.json \
   background.js \
+  active-tab.js \
+  sleep.html sleep.js sleep.css \
   popup.html popup.js popup.css \
   settings.html settings.js settings.css \
   stats-dashboard.html stats-dashboard.js \

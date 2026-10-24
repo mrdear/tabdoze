@@ -255,7 +255,7 @@ async function loadTabs() {
                 tabs: win.tabs.map(tab => ({
                     id: tab.id,
                     windowId: tab.windowId,
-                    url: tab.url || '',
+                    url: getSleepingPageUrl(tab.url) || tab.url || '',
                     title: tab.title || 'Untitled',
                     favIconUrl: tab.favIconUrl || '',
                     active: tab.active,
@@ -429,7 +429,13 @@ function isAllowedFaviconSource(source) {
 }
 
 function isSuspendedTab(tab) {
-    return Boolean(tab?.discarded);
+    return Boolean(tab?.discarded || getSleepingPageUrl(tab?.url));
+}
+
+function getSleepingPageUrl(url) {
+    const prefix = `${chrome.runtime.getURL('sleep.html')}#`;
+    if (!url?.startsWith(prefix)) return null;
+    return new URLSearchParams(url.slice(prefix.length)).get('url');
 }
 
 // Get whitelist settings from storage
@@ -491,6 +497,9 @@ async function suspendTabDirect(tabId, url, title, favicon, whitelistedDomains =
             return false;
         }
 
+        if (tab.pinned) {
+            await safeSendMessage({ type: 'MARK_PINNED_FAVICON', tabId });
+        }
         await markTabTitleAsDiscarded(tabId, tab.title || title);
         try {
             const discardedTab = await chrome.tabs.discard(tabId);
@@ -605,6 +614,12 @@ function clearDiscardedTitleMarker(prefix, stateKey) {
     while (document.title.startsWith(prefix)) {
         document.title = document.title.slice(prefix.length);
     }
+    const favicon = globalThis.__tabDozeSleepingFavicon;
+    if (favicon) {
+        favicon.marker.remove();
+        document.head.append(...favicon.icons);
+        delete globalThis.__tabDozeSleepingFavicon;
+    }
 }
 
 // Update memory stats locally (mirrors background.js logic)
@@ -640,7 +655,10 @@ async function restoreTabDirect(tabId, currentUrl) {
         const tab = await chrome.tabs.get(tabId).catch(() => null);
         if (!tab) return;
 
-        if (tab.discarded) {
+        const originalUrl = getSleepingPageUrl(tab.url);
+        if (originalUrl) {
+            await chrome.tabs.update(tabId, { url: originalUrl });
+        } else if (tab.discarded) {
             await chrome.tabs.reload(tabId);
         }
     } catch (error) {

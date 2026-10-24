@@ -28,4 +28,5 @@ jobs:
           gh release create "${GITHUB_REF_NAME}" \
             dist/tabdoze-*-extension.zip \
             --title "TabDoze ${GITHUB_REF_NAME}" \
+            --latest \
             --generate-notes

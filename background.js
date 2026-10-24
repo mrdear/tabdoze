@@ -56,6 +56,7 @@ async function safeExecute(fn, operationName, defaultValue = null) {
 
 const DEFAULT_CONFIG = {
     suspensionTimeout: 30,
+    suspendActiveTab: false,
     whitelistedDomains: []
 };
 
@@ -224,7 +225,11 @@ function normalizeSettings(settings = {}) {
             .filter(Boolean)
         : [];
 
-    return { suspensionTimeout, whitelistedDomains };
+    return {
+        suspensionTimeout,
+        suspendActiveTab: settings.suspendActiveTab === true,
+        whitelistedDomains
+    };
 }
 
 async function loadSettings() {
@@ -522,7 +527,10 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
     return enqueueSchedulerTask(
-        () => runSuspensionSweep(activeInfo),
+        async () => {
+            await startActiveTabTracking(activeInfo.tabId);
+            await runSuspensionSweep(activeInfo);
+        },
         'tab activation'
     );
 });
@@ -533,7 +541,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     // - popup.js updateMemoryStatsLocal() for direct popup suspensions
     // Do NOT add stats tracking here - it would cause double-counting
 
-    if (changeInfo.discarded !== undefined) {
+    if (changeInfo.discarded !== undefined || changeInfo.url !== undefined) {
         await updateBadge();
     }
 
@@ -583,6 +591,17 @@ async function handleMessage(message, sender) {
         await ensureSettingsLoaded();
 
         switch (message.type) {
+            case 'MARK_PINNED_FAVICON': {
+                const tab = await chrome.tabs.get(message.tabId).catch(() => null);
+                return { success: await markPinnedTabFavicon(tab) };
+            }
+
+            case 'SUSPEND_IDLE_ACTIVE_TAB':
+                return await enqueueSchedulerTask(
+                    () => suspendIdleActiveTab(sender),
+                    'idle current tab'
+                );
+
             case 'SUSPEND_TAB':
                 if (message.tabId === undefined) {
                     console.warn('[BG] SUSPEND_TAB received without tabId');
@@ -619,6 +638,7 @@ async function handleMessage(message, sender) {
             case 'SAVE_SETTINGS':
                 config = normalizeSettings({ ...config, ...message.settings });
                 await saveSettings();
+                await startActiveTabTracking();
                 await enqueueSchedulerTask(runSuspensionSweep, 'settings update');
                 return { success: true };
 
@@ -636,6 +656,7 @@ async function handleMessage(message, sender) {
                 // Reload settings from storage (called when popup updates whitelist)
                 settingsReadyPromise = loadSettings();
                 await settingsReadyPromise;
+                await startActiveTabTracking();
                 await enqueueSchedulerTask(runSuspensionSweep, 'config reload');
                 console.log('[BG][CONFIG] Reloaded settings from storage');
                 return { success: true };
@@ -653,6 +674,59 @@ async function handleMessage(message, sender) {
 // ============================================================================
 // SUSPENSION LOGIC
 // ============================================================================
+
+function isActiveSleepCandidate(tab) {
+    return Boolean(
+        config.suspendActiveTab &&
+        tab?.active &&
+        /^https?:\/\//i.test(tab.url || '') &&
+        !isSuspendedTab(tab) &&
+        !isWhitelisted(tab.url)
+    );
+}
+
+async function startActiveTabTracking(tabId = null) {
+    if (!config.suspendActiveTab) return;
+    const tabs = tabId === null
+        ? await chrome.tabs.query({ active: true })
+        : [await chrome.tabs.get(tabId).catch(() => null)];
+
+    await Promise.all(tabs.filter(isActiveSleepCandidate).map(tab => (
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id, allFrames: true },
+            files: ['active-tab.js']
+        }).catch(() => {})
+    )));
+}
+
+async function suspendIdleActiveTab(sender) {
+    if (sender.frameId !== 0 || sender.tab?.id === undefined) return { success: false };
+    const tab = await chrome.tabs.get(sender.tab.id).catch(() => null);
+    if (!isActiveSleepCandidate(tab)) return { success: false };
+    const favicon = tab.pinned ? await createSleepingFavicon(tab.url) : null;
+
+    // Read frame activity at the deadline so iframe input also keeps the page awake.
+    const activity = await chrome.scripting.executeScript({
+        target: { tabId: tab.id, allFrames: true },
+        func: () => globalThis.__tabDozeLastActivity || 0
+    });
+    const lastActivity = Math.max(0, ...activity.map(frame => Number(frame.result) || 0));
+    if (!lastActivity) return { success: false };
+    if (Date.now() - lastActivity < getSuspensionTimeoutMs() * 1.5) {
+        return { success: false, lastActivity };
+    }
+
+    const latestTab = await chrome.tabs.get(tab.id).catch(() => null);
+    if (!isActiveSleepCandidate(latestTab) || latestTab.url !== tab.url) return { success: false };
+    const parameters = new URLSearchParams({ url: latestTab.url, title: latestTab.title || '' });
+    if (favicon) parameters.set('favicon', favicon);
+    await chrome.tabs.update(tab.id, {
+        url: `${chrome.runtime.getURL('sleep.html')}#${parameters}`
+    });
+    await updateMemoryStats(latestTab.url);
+    await updateBadge();
+    return { success: true };
+}
 
 async function shouldSuspendTab(tabId) {
     try {
@@ -689,6 +763,7 @@ async function suspendTab(tabId) {
             return false;
         }
 
+        await markPinnedTabFavicon(tab);
         await markTabTitleAsDiscarded(tabId, tab.title);
 
         // Native Chrome discard unloads the page from memory while keeping it in the tab strip.
@@ -721,6 +796,77 @@ async function suspendTab(tabId) {
     } catch (error) {
         console.error('[BG] Failed to suspend tab:', error);
         return false;
+    }
+}
+
+async function createSleepingFavicon(pageUrl) {
+    try {
+        const faviconUrl = new URL(chrome.runtime.getURL('_favicon/'));
+        faviconUrl.searchParams.set('pageUrl', pageUrl);
+        faviconUrl.searchParams.set('size', '32');
+        const response = await fetch(faviconUrl);
+        const bitmap = await createImageBitmap(await response.blob());
+        const canvas = new OffscreenCanvas(32, 32);
+        const context = canvas.getContext('2d');
+        context.drawImage(bitmap, 0, 0, 32, 32);
+        bitmap.close();
+        context.fillStyle = '#2563EB';
+        context.beginPath();
+        context.arc(24, 8, 8, 0, Math.PI * 2);
+        context.fill();
+        context.fillStyle = '#FFFFFF';
+        context.font = 'bold 12px sans-serif';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText('Z', 24, 8.5);
+        const png = await canvas.convertToBlob({ type: 'image/png' });
+        return `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(await png.arrayBuffer())))}`;
+    } catch (error) {
+        console.warn('[BG] Could not create sleeping favicon:', error);
+        return null;
+    }
+}
+
+async function markPinnedTabFavicon(tab) {
+    if (!tab?.pinned || !/^https?:\/\//i.test(tab.url || '')) return false;
+    const favicon = await createSleepingFavicon(tab.url);
+    if (!favicon) return false;
+
+    let onUpdated;
+    let timeout;
+    // Wait for Chrome to receive the new favicon before discarding.
+    const faviconReady = new Promise(resolve => {
+        onUpdated = (tabId, changeInfo) => {
+            if (tabId === tab.id && changeInfo.favIconUrl === favicon) resolve(true);
+        };
+        chrome.tabs.onUpdated.addListener(onUpdated);
+        timeout = setTimeout(() => resolve(false), 1000);
+    });
+
+    try {
+        await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: markedFavicon => {
+                const previous = globalThis.__tabDozeSleepingFavicon;
+                previous?.marker.remove();
+                const icons = previous?.icons || Array.from(document.head.querySelectorAll('link[rel~="icon" i]'));
+                icons.forEach(icon => icon.remove());
+                const marker = document.createElement('link');
+                marker.rel = 'icon';
+                marker.type = 'image/png';
+                marker.sizes = '32x32';
+                marker.href = markedFavicon;
+                document.head.appendChild(marker);
+                globalThis.__tabDozeSleepingFavicon = { icons, marker };
+            },
+            args: [favicon]
+        });
+        return await faviconReady;
+    } catch {
+        return false;
+    } finally {
+        clearTimeout(timeout);
+        chrome.tabs.onUpdated.removeListener(onUpdated);
     }
 }
 
@@ -811,6 +957,12 @@ function clearDiscardedTitleMarker(prefix, stateKey) {
     while (document.title.startsWith(prefix)) {
         document.title = document.title.slice(prefix.length);
     }
+    const favicon = globalThis.__tabDozeSleepingFavicon;
+    if (favicon) {
+        favicon.marker.remove();
+        document.head.append(...favicon.icons);
+        delete globalThis.__tabDozeSleepingFavicon;
+    }
 }
 
 async function restoreTab(tabId) {
@@ -820,6 +972,13 @@ async function restoreTab(tabId) {
         if (!tab) {
             console.log(`[BG][RESTORE] Tab ${tabId} no longer exists`);
             return false;
+        }
+
+        const originalUrl = getSleepingPageUrl(tab.url);
+        if (originalUrl) {
+            await chrome.tabs.update(tabId, { url: originalUrl });
+            await updateBadge();
+            return true;
         }
 
         if (tab.discarded) {
@@ -979,7 +1138,13 @@ function isInternalPage(url) {
 }
 
 function isSuspendedTab(tab) {
-    return Boolean(tab?.discarded);
+    return Boolean(tab?.discarded || getSleepingPageUrl(tab?.url));
+}
+
+function getSleepingPageUrl(url) {
+    const prefix = `${chrome.runtime.getURL('sleep.html')}#`;
+    if (!url?.startsWith(prefix)) return null;
+    return new URLSearchParams(url.slice(prefix.length)).get('url');
 }
 
 // ============================================================================
@@ -1069,7 +1234,7 @@ async function getTabList() {
             tabs: win.tabs.map(tab => ({
                 id: tab.id,
                 windowId: tab.windowId,
-                url: tab.url || '',
+                url: getSleepingPageUrl(tab.url) || tab.url || '',
                 title: tab.title || 'Untitled',
                 favIconUrl: tab.favIconUrl || '',
                 active: tab.active,
@@ -1142,6 +1307,7 @@ async function updateBadge() {
         }
 
         await enqueueSchedulerTask(runSuspensionSweep, 'service worker initialization');
+        await startActiveTabTracking();
 
         if (!isExtensionContextValid()) {
             console.warn('[BG] Context invalidated after scheduler initialization');

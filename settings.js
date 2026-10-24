@@ -18,6 +18,8 @@ const customTimingSection = document.getElementById('customTimingSection');
 const customTimingSlider = document.getElementById('customTimingSlider');
 const timeoutSlider = document.getElementById('timeout');
 const timeoutValue = document.getElementById('timeoutValue');
+const suspendActiveTabCheckbox = document.getElementById('suspendActiveTab');
+const activeTabSleepDescription = document.getElementById('activeTabSleepDescription');
 
 // DOM Elements - Whitelist
 const addCurrentSiteBtn = document.getElementById('addCurrentSiteBtn');
@@ -62,7 +64,7 @@ async function initIncludedFeatures() {
 async function loadSettings() {
     try {
         const response = await chrome.runtime.sendMessage({ type: 'GET_SETTINGS' });
-        settings = response.settings || {};
+        settings = { suspendActiveTab: false, ...response.settings };
 
         const timeout = settings.suspensionTimeout || 30;
         currentProfile = getProfileForTimeout(timeout);
@@ -99,6 +101,10 @@ function updateUI() {
         updateTimeoutDisplay();
     }
 
+    if (suspendActiveTabCheckbox) {
+        suspendActiveTabCheckbox.checked = settings.suspendActiveTab === true;
+    }
+
     // Update whitelist
     renderWhitelist();
 }
@@ -113,6 +119,9 @@ function updateProfileSelector() {
 
     const timeout = Number(settings.suspensionTimeout) || Number(timeoutSlider?.value) || 30;
     profileStatus.innerHTML = `Currently: Tabs sleep after <strong>${timeout} minutes</strong>`;
+    if (activeTabSleepDescription) {
+        activeTabSleepDescription.textContent = `Sleep after ${timeout * 1.5} minutes without interaction (1.5× the sleep delay). Click Wake tab to reload the page.`;
+    }
 }
 
 function getProfileForTimeout(timeout) {
@@ -163,6 +172,11 @@ function setupEventListeners() {
         updateTimeoutDisplay();
         updateProfileSelector();
         debouncedSave();
+    });
+
+    suspendActiveTabCheckbox?.addEventListener('change', () => {
+        settings.suspendActiveTab = suspendActiveTabCheckbox.checked;
+        saveSettings();
     });
 
     // Whitelist - Add current site
@@ -324,6 +338,7 @@ async function saveSettings() {
     try {
         const newSettings = {
             suspensionTimeout: parseInt(timeoutSlider?.value || settings.suspensionTimeout || 30, 10),
+            suspendActiveTab: suspendActiveTabCheckbox?.checked === true,
             whitelistedDomains: settings.whitelistedDomains || []
         };
 
@@ -389,6 +404,10 @@ function validateImportedSettings(imported) {
 
     if (typeof imported.suspensionTimeout === 'number' && imported.suspensionTimeout >= 1 && imported.suspensionTimeout <= 120) {
         valid.suspensionTimeout = imported.suspensionTimeout;
+    }
+
+    if (typeof imported.suspendActiveTab === 'boolean') {
+        valid.suspendActiveTab = imported.suspendActiveTab;
     }
 
     if (Array.isArray(imported.whitelistedDomains)) {

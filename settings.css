@@ -294,6 +294,31 @@ body {
     margin-bottom: 12px;
 }
 
+.active-tab-setting {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.active-tab-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.active-tab-toggle input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+}
+
+.active-tab-setting .timing-feature-desc {
+    margin: 8px 0 0 26px;
+}
+
 /* Custom Timing Slider */
 .custom-timing-slider {
     display: flex;
