@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+      - run: npm test
+      - run: npm run check
+      - name: Verify tag matches manifest
+        run: test "${GITHUB_REF_NAME}" = "v$(node -p "require('./manifest.json').version")"
+      - run: npm run package
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            dist/tabdoze-*-extension.zip \
+            --title "TabDoze ${GITHUB_REF_NAME}" \
+            --generate-notes

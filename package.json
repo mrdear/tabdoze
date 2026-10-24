@@ -1,0 +1,14 @@
+{
+  "name": "tabdoze",
+  "version": "1.1.2",
+  "private": true,
+  "description": "Let idle Chromium tabs sleep with native discard.",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node scripts/validate.js",
+    "package": "bash scripts/package-extension.sh"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

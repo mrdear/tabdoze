@@ -1,0 +1,21 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# Node modules (if any)
+node_modules/
+
+# Build artifacts
+*.zip
+release/
+dist/
+tmp/
+
+# Local development
+.env
+.env.local

@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "TabDoze - Let Idle Tabs Sleep",
+  "short_name": "TabDoze",
+  "version": "1.1.2",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoobNJgenmx7lowykgn3MwUGtFnPb2OnBvZByQ7Ur1sQeaxDMmVzblZ27zCsFyrvYWMGYdS10kwJoQENneUTY8CQr4KMXJb8aPculKz5IPAeVyr7PcBY2uOQe5c5Eor6iJaFjENRXsd0/kU/pS15GSamv70Eg3KtZfq2FcYtuFCbFYCTwsuiNKXCAHw8Xq8O+mtfRr9ZhtsgfTchzpuG+h7oQnmYToUwa3j4opreKdyFghFb8HetzxmZCw3RnbIO2VJ0yZh+rPeeQNkDNZ/zdsaXs817aAoUMZvLLt+irJxUkHRg20xYxYP/oTCXMasvFDNvoNOq/JrYxJlGv2qhENwIDAQAB",
+  "description": "Let inactive tabs sleep with Chrome's native discard. Keep their place, reduce background load, and browse without tracking.",
+  "homepage_url": "https://github.com/mrdear/tabdoze",
+  "minimum_chrome_version": "102",
+  "action": {
+    "default_title": "TabDoze",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "contextMenus",
+    "alarms"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "options_page": "settings.html",
+  "commands": {
+    "suspend_others": {
+      "suggested_key": {
+        "default": "Alt+Shift+S"
+      },
+      "description": "Sleep all other tabs"
+    },
+    "restore_all": {
+      "suggested_key": {
+        "default": "Alt+R"
+      },
+      "description": "Wake all sleeping tabs"
+    },
+    "whitelist_site": {
+      "suggested_key": {
+        "default": "Alt+W"
+      },
+      "description": "Whitelist current site"
+    }
+  }
+}

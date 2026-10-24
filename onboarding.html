@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to TabDoze</title>
+    <link rel="stylesheet" href="onboarding.css">
+</head>
+
+<body>
+    <div class="onboarding-container">
+        <!-- Background -->
+        <div class="bg-gradient"></div>
+        <div class="bg-particles" id="particles"></div>
+
+        <!-- Progress bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Steps container -->
+        <div class="steps-container" id="stepsContainer">
+
+            <!-- Step 1: Welcome -->
+            <section class="step active" data-step="1">
+                <div class="step-content">
+                    <div class="hero-icon">
+                        <img src="icons/icon128.png" alt="TabDoze">
+                    </div>
+                    <h1 class="hero-title">Let Idle Tabs Sleep</h1>
+                    <p class="hero-desc">
+                        TabDoze uses Chromium's native discard feature to unload inactive pages
+                        while keeping every tab in place for when you return.
+                    </p>
+
+                    <div class="stats-preview">
+                        <div class="stat-item">
+                            <span class="stat-number">Native</span>
+                            <span class="stat-label">Chromium Discard</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">Local</span>
+                            <span class="stat-label">Settings & Stats</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">1-120m</span>
+                            <span class="stat-label">Sleep Schedule</span>
+                        </div>
+                    </div>
+
+                    <div class="trust-badges">
+                        <div class="badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                            No Tracking
+                        </div>
+                        <div class="badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            Local Settings
+                        </div>
+                        <div class="badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Auditable Source
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: How it works -->
+            <section class="step" data-step="2">
+                <div class="step-content">
+                    <div class="migration-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <path
+                                d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 0 1 9-9">
+                            </path>
+                        </svg>
+                    </div>
+                    <h2 id="migrationTitle">Native Sleep, Predictable Wake</h2>
+                    <p class="step-desc" id="migrationDesc">
+                        Nothing is replaced with a placeholder page. Chromium unloads the page
+                        and reloads it in the same tab when you come back.
+                    </p>
+
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>Your active tab always stays awake</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>Keep-awake sites are never put to sleep</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>URL, title, favicon, and tab position stay in place</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>Sleeping tabs wake when selected</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                            <span><a href="https://github.com/mrdear/tabdoze" class="source-link" id="viewSourceLink">View source code</a></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Step 3: Quick Setup with Permissions -->
+            <section class="step" data-step="3">
+                <div class="step-content">
+                    <h2>Quick Setup</h2>
+                    <p class="step-desc">Choose when TabDoze should put inactive tabs to sleep</p>
+
+                    <div class="setup-options">
+                        <div class="option-group">
+                            <label class="option-label">Sleep tabs after</label>
+                            <div class="option-control">
+                                <input type="range" id="setupTimeout" min="1" max="120" value="30" class="slider">
+                                <span class="slider-value" id="setupTimeoutValue">30 min</span>
+                            </div>
+                        </div>
+
+                        <div class="option-group">
+                            <label class="option-label">Sites to keep awake</label>
+                            <div class="whitelist-chips">
+                                <label class="chip">
+                                    <input type="checkbox" checked data-domain="mail.google.com">
+                                    <span>Gmail</span>
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" checked data-domain="calendar.google.com">
+                                    <span>Calendar</span>
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" checked data-domain="docs.google.com">
+                                    <span>Docs</span>
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" data-domain="github.com">
+                                    <span>GitHub</span>
+                                </label>
+                                <label class="chip">
+                                    <input type="checkbox" data-domain="slack.com">
+                                    <span>Slack</span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Permissions Explanation -->
+                    <div class="permissions-section">
+                        <h3>Why We Need These Permissions</h3>
+                        <div class="permission-items">
+                            <div class="permission-item">
+                                <div class="permission-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="9" x2="15" y2="9"></line>
+                                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                                    </svg>
+                                </div>
+                                <div class="permission-text">
+                                    <strong>tabs</strong> - To see which tabs can sleep or wake
+                                </div>
+                            </div>
+                            <div class="permission-item">
+                                <div class="permission-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                        <polyline points="7 3 7 8 15 8"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="permission-text">
+                                    <strong>storage</strong> - To remember your schedule and keep-awake list
+                                </div>
+                            </div>
+                        </div>
+                        <p class="permission-note">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                            All data stays on your device. We never collect or transmit any data.
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <!-- Step 4: See it work -->
+            <section class="step" data-step="4">
+                <div class="step-content">
+                    <h2>See It Work</h2>
+                    <p class="step-desc">Watch TabDoze put background tabs to sleep</p>
+
+                    <div class="demo-container">
+                        <div class="demo-tabs" id="demoTabs">
+                            <div class="demo-tab active">
+                                <div class="demo-favicon"></div>
+                                <span>Current Tab</span>
+                                <span class="demo-status active">Active</span>
+                            </div>
+                            <div class="demo-tab" id="demoTab1">
+                                <div class="demo-favicon"></div>
+                                <span>Example Tab 1</span>
+                                <span class="demo-status idle">Idle</span>
+                            </div>
+                            <div class="demo-tab" id="demoTab2">
+                                <div class="demo-favicon"></div>
+                                <span>Example Tab 2</span>
+                                <span class="demo-status idle">Idle</span>
+                            </div>
+                        </div>
+
+                        <div class="demo-action">
+                            <button class="demo-btn" id="demoBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="6" y="4" width="4" height="16"></rect>
+                                    <rect x="14" y="4" width="4" height="16"></rect>
+                                </svg>
+                                Sleep Inactive Tabs
+                            </button>
+                        </div>
+
+                        <div class="demo-result hidden" id="demoResult">
+                            <div class="result-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </div>
+                            <span class="result-text" id="demoResultText">2 tabs sleeping • estimated 100 MB relief</span>
+                        </div>
+                    </div>
+
+                    <p class="demo-note">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Sleeping tabs wake in place when you select them
+                    </p>
+                </div>
+            </section>
+            <!-- Step 5: Complete with Progressive Discovery -->
+            <section class="step" data-step="5">
+                <div class="step-content">
+                    <div class="complete-icon">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <h2>You're All Set!</h2>
+                    <p class="step-desc">
+                        TabDoze is now watching inactivity deadlines in the background.
+                        Open the extension anytime to sleep tabs, wake them, or adjust the schedule.
+                    </p>
+
+                    <div class="progressive-discovery">
+                        <h3>Included Features</h3>
+                        <div class="feature-timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="timeline-content">
+                                    <strong>Native tab sleep</strong>
+                                    <p>Uses Chromium discard without replacing your tabs</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="timeline-content">
+                                    <strong>Sleep other tabs</strong>
+                                    <p>Keep your current tab awake and unload the rest</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="timeline-content">
+                                    <strong>Transparent estimates</strong>
+                                    <p>See estimated memory relief and sleep history</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="shortcuts-preview">
+                        <h3>Keyboard Shortcuts</h3>
+                        <div class="shortcut-list">
+                            <div class="shortcut-item">
+                                <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>
+                                <span>Sleep other tabs</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Alt</kbd> + <kbd>R</kbd>
+                                <span>Wake all tabs</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <kbd>Alt</kbd> + <kbd>W</kbd>
+                                <span>Keep current site awake</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="nav-btn back" id="backBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back
+            </button>
+            <div class="step-indicator">
+                <span class="step-counter" id="stepCounter">Step 1 of 5</span>
+                <div class="step-dots" id="stepDots">
+                    <button class="dot active" data-step="1" aria-label="Go to step 1"></button>
+                    <button class="dot" data-step="2" aria-label="Go to step 2"></button>
+                    <button class="dot" data-step="3" aria-label="Go to step 3"></button>
+                    <button class="dot" data-step="4" aria-label="Go to step 4"></button>
+                    <button class="dot" data-step="5" aria-label="Go to step 5"></button>
+                </div>
+            </div>
+            <button class="nav-btn next" id="nextBtn">
+                Next
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Milestone Notification Template -->
+    <div class="milestone-notification" id="milestoneNotification" style="display: none;">
+        <div class="milestone-content">
+            <div class="milestone-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+            </div>
+            <div class="milestone-text">
+                <strong id="milestoneTitle">Milestone Reached!</strong>
+                <p id="milestoneMessage">Estimated memory relief reached 1 GB.</p>
+            </div>
+            <button class="milestone-close" id="milestoneClose">×</button>
+        </div>
+    </div>
+
+    <script src="onboarding.js"></script>
+</body>
+
+</html>
